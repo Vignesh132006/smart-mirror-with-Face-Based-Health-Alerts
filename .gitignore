@@ -1,0 +1,4 @@
+__pycache__/
+dataset/Unknown/
+*.pyc
+.DS_Store

@@ -1,0 +1,14 @@
+{
+  "vignesh": {
+    "greeting": "Hello Vignesh!",
+    "alert": "Stay Hydrated! Drink at least 8 glasses of water today."
+  },
+  "Unknown": {
+    "greeting": "Welcome to Smart Mirror!",
+    "alert": "Keep smiling and stay healthy today!"
+  },
+  "default": {
+    "greeting": "Welcome!",
+    "alert": "Stay healthy, positive, and active!"
+  }
+}
