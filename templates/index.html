@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Mirror Dashboard</title>
+    <!-- Google Fonts for premium typography -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@200;300;400;500;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,700;1,9..40,400&display=swap" rel="stylesheet">
+    <!-- FontAwesome for modern icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="mirror-container">
+        <!-- Dashboard Top Header Bar -->
+        <header class="dashboard-header fade-in">
+            <div class="time-widget">
+                <h1 id="live-time">00:00:00</h1>
+                <p id="live-date">Thursday, June 4, 2026</p>
+            </div>
+            <div class="weather-widget">
+                <div class="weather-info">
+                    <span id="weather-temp">N/A</span>
+                    <span class="weather-unit">°C</span>
+                </div>
+                <div class="weather-details">
+                    <p id="weather-desc"><i class="fa-solid fa-spinner fa-spin"></i> Loading weather...</p>
+                    <p id="weather-humidity"><i class="fa-solid fa-droplet"></i> Humidity: --%</p>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Body Grid -->
+        <main class="dashboard-grid">
+            
+            <!-- Column 1: Video Mirror Frame -->
+            <section class="grid-card mirror-feed-card fade-in">
+                <div class="card-header">
+                    <h2><i class="fa-solid fa-camera"></i> Live Mirror View</h2>
+                    <button id="toggle-camera-btn" class="control-btn" title="Toggle Mirror Feed">
+                        <i class="fa-solid fa-eye-slash"></i> Hide Feed
+                    </button>
+                </div>
+                <div class="video-wrapper" id="video-wrapper">
+                    <!-- Standard video feed from Flask -->
+                    <img id="video-stream" src="{{ url_for('video_feed') }}" alt="Mirror Camera Feed">
+                    <div id="video-placeholder" class="video-placeholder hidden">
+                        <i class="fa-solid fa-video-slash"></i>
+                        <p>Camera Feed Hidden</p>
+                    </div>
+                </div>
+                <div class="feed-footer">
+                    <div class="status-indicator">
+                        <span class="pulse-dot"></span>
+                        <span id="system-status">Scanning for face...</span>
+                    </div>
+                    <span id="recognition-confidence" class="confidence-label">Confidence: --%</span>
+                </div>
+            </section>
+
+            <!-- Column 2: Health Info and Alerts -->
+            <section class="right-column-grid">
+                
+                <!-- Greeting Card -->
+                <div class="grid-card info-card greeting-card fade-in">
+                    <div class="card-glow"></div>
+                    <div class="user-avatar-circle">
+                        <i class="fa-solid fa-user-astronaut"></i>
+                    </div>
+                    <div class="greeting-text">
+                        <p class="greeting-subtitle">Welcome Back</p>
+                        <h2 id="user-greeting">Hello, Guest!</h2>
+                    </div>
+                </div>
+
+                <!-- Health Alerts Card -->
+                <div class="grid-card info-card health-alert-card fade-in">
+                    <div class="alert-border-glow"></div>
+                    <div class="card-header">
+                        <h2><i class="fa-solid fa-circle-nodes"></i> Health Alert Center</h2>
+                    </div>
+                    <div class="alert-box">
+                        <div class="alert-icon">
+                            <i id="health-icon" class="fa-solid fa-heart-pulse"></i>
+                        </div>
+                        <div class="alert-content">
+                            <h3 id="alert-label">Daily Recommendation</h3>
+                            <p id="health-alert">Keep smiling and stay healthy today!</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Stats Info Card -->
+                <div class="grid-card info-card stats-card fade-in">
+                    <div class="card-header">
+                        <h2><i class="fa-solid fa-gauge-high"></i> Mirror Metrics</h2>
+                    </div>
+                    <div class="metrics-grid">
+                        <div class="metric-item">
+                            <i class="fa-solid fa-temperature-three-quarters text-gradient-orange"></i>
+                            <div class="metric-val">
+                                <h4 id="stat-temp">N/A</h4>
+                                <p>Air Temp</p>
+                            </div>
+                        </div>
+                        <div class="metric-item">
+                            <i class="fa-solid fa-droplet text-gradient-blue"></i>
+                            <div class="metric-val">
+                                <h4 id="stat-humidity">N/A</h4>
+                                <p>Humidity</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </section>
+        </main>
+
+        <!-- Dashboard Action Bar (Configuration Toggle) -->
+        <footer class="dashboard-footer fade-in">
+            <button id="open-config-btn" class="dashboard-action-btn">
+                <i class="fa-solid fa-sliders"></i> Smart Mirror Settings
+            </button>
+        </footer>
+    </div>
+
+    <!-- Configuration Modal (Frosted Glass Panel) -->
+    <div id="config-modal" class="modal-overlay hidden">
+        <div class="modal-content glassmorphism">
+            <div class="modal-header">
+                <h2><i class="fa-solid fa-sliders"></i> Configuration Manager</h2>
+                <button id="close-modal-btn" class="close-btn"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="modal-body">
+                <p class="modal-desc">Customize greetings and health alerts dynamically. Add or edit user configurations in real-time.</p>
+                <div id="config-users-list" class="config-users-list">
+                    <!-- Dynamic user config rows will be loaded here -->
+                </div>
+                <div class="add-user-form">
+                    <h3><i class="fa-solid fa-user-plus"></i> Add New Profile</h3>
+                    <div class="form-row">
+                        <input type="text" id="new-username" placeholder="Username (e.g. Vignesh)">
+                        <input type="text" id="new-greeting" placeholder="Greeting Message (e.g. Good Morning Vignesh!)">
+                        <input type="text" id="new-alert" placeholder="Health Alert (e.g. Drink more water today!)">
+                        <button id="add-user-btn" class="add-btn"><i class="fa-solid fa-plus"></i> Add</button>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="save-config-btn" class="save-btn"><i class="fa-solid fa-floppy-disk"></i> Save & Apply Changes</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='app.js') }}"></script>
+</body>
+</html>
